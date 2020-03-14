@@ -14,7 +14,7 @@
 (define (sqrt-iter guess x)
   (if (good-enough? guess x)
       guess
-      (sqrt-iter (improve guess x) guess)))
+      (sqrt-iter (improve guess x) x)))
 
 (define (improve guess x)
   (average guess (/ x guess)))
@@ -22,18 +22,10 @@
 (define (average x y)
   (/ (+ x y) 2))
 
-; Original
-;; (define (good-enough? guess x)
-;;   (< (abs (- (square guess) x)) 0.001))
-; Exercise 1.7
-(define (good-enough? guess prev-guess)
-  (< (abs (- (/ prev-guess guess) 1)) 0.001))
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
 
 (define (sqrt x)
   (sqrt-iter 1.0 x))
 
-; Test
-(define (similar? x y) (< (abs (- x y)) 1e-4))
 
-(similar? 3 (sqrt 9))
-(similar? 0.1 (sqrt 0.01))
