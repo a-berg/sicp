@@ -1,3 +1,5 @@
+;; An example of block structure with lexical scoping
+;; I wonder: Does python has lexical scoping too?
 #lang sicp
 
 (define (square x) (* x x))
