@@ -1,0 +1,86 @@
+#+PROPERTY: header-args :tangle yes
+* Statement
+  The process that a procedure generates is of course dependent on the rules
+  used by the interpreter. As an example, consider the iterative ~gcd~ procedure
+  given above. Suppose we were to interpret this procedure using normal-order
+  evaluation, as discussed in 1.1.5. (The normal-order-evaluation rule for ~if~ is
+  described in Exercise 1.5.) Using the substitution method (for normal order),
+  illustrate the process generated in evaluating ~(gcd 206 40)~ and indicate the
+  ~remainder~ operations that are actually performed. How many ~remainder~
+  operations are actually performed in the normal-order evaluation of ~(gcd 206
+  40)~? In the applicative-order evaluation?
+  
+  #+begin_src racket
+    (define (gcd a b)
+      (if (= b 0)
+          a
+          (gcd b (remainder a b))))
+  #+end_src
+
+* Solution
+  First, let us use the applicative order to get an idea of the full computation.
+  
+  #+begin_src racket :tangle no
+    (gcd 206 40)
+    (gcd 40 (remainder 206 40)) ; 1
+    (gcd 40 6)
+    (gcd 6 (remainder 40 6)) ;    2
+    (gcd 6 4)
+    (gcd 4 (remainder 6 4)) ;     3
+    (gcd 4 2)
+    (gcd 2 (remainder 4 2)) ;     4
+    (gcd 2 0)
+    2
+  #+end_src
+
+  I count 4 remainders, and a grand total of 5 gcd calls. The thing now is that
+  at each one of these ~(gcd a (remainder a b))~, the normal order evaluation is
+  going to enter into the formula (because the leftmost outermost function is
+  the gcd itself) and is going to evaluate whatever ~b~ is in order to evaluate
+  the conditional. The number of ~remainder~ operations in each of these ~b~
+  will be $1 + R_a + R_b$, with $R_x$ being the number of ~remainder~ calls in
+  the expression ~a~ or ~b~.
+
+  Let's think a bit about this. At each step, it is clear that $R_a$ will be
+  updated as $R_a \leftarrow R_b$, all the while $R_b \leftarrow 1 + R_a + R_b$.
+  This is very interesting indeed, because its kind of similar to the Fibonacci
+  sequence. Let us make a table:
+
+  | step | $R_a$ | $R_b$ |
+  |------+-------+-------|
+  |    1 |     0 |     1 |
+  |    2 |     1 |     2 |
+  |    3 |     2 |     4 |
+  |    4 |     4 |     7 |
+  |------+-------+-------|
+  |      |       |    14 |
+  #+TBLFM: @6$3=vsum(@2..@-1)
+
+  At the bottom, I have summed (thanks org-mode!) the calls in the $R_b$ column,
+  giving us a grand total of 14, while the final evaluation has accumulated 4
+  ~remainder~ calls in the term of ~a~, which means a total of 18.
+
+* Addendum
+  If we want to go a bit further and compute the total number of calls (assuming
+  we know the number of ~gcd~ calls beforehand) of remainder by the following
+  function:
+
+#+begin_src racket
+  (define (count-calls n)
+    (define (iter a b c n)
+      (if (= n 1)
+          (+ a c)
+          (iter b (+ 1 a b) (+ a b) (- n 1))))
+    (iter 0 1 0 n))
+
+(check-equal? (count-calls 5) 18)
+#+end_src
+
+  The procedure is very simple. The variable ~c~ simply cummulatively sums ~b~.
+  The ~a~ and ~b~ variables update as defined.
+
+  NOTE: There is a but somewhere. The value for 5 is OK, but it is wrong for
+  values of n from 1 to 4 (gives a value that is +1 the actual value). Also
+  fails for n=6...
+  
+  

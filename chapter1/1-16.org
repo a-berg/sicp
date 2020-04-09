@@ -1,0 +1,68 @@
+#+PROPERTY: header-args :tangle yes
+* Statement
+  Design a procedure that evolves an iterative exponentiation process that uses
+  successive squaring and uses a logarithmic number of steps, as does
+  ~fast-expt~.
+
+  /Hint/: Using the observation that $( b^{n \over 2})^2 = ( b^2 )^{n \over 2}$,
+  keep, along with the exponent $n$ and the base $b$, an additional state
+  variable $a$, and define the state transformation in such a way that the
+  product $ab^n$ is unchanged from state to state. At the beginning of the
+  process $a$ is taken to be 1, and the answer is given by the value of $a$ at
+  the end of the process. In general, the technique of defining an /invariant
+  quantity/ that remains unchanged from state to state is a powerful way to
+  think about the design of iterative algorithms.
+
+* Solution
+
+  #+begin_src racket
+    #lang sicp
+    (#%require rackunit)
+  #+end_src
+
+  I came up with the following example:
+  
+  | b    | exponent | a    |
+  |------+----------+------|
+  | b    |      100 | 1    |
+  | b²   |       50 | 1    |
+  | b⁴   |       25 | 1    |
+  | b⁸   |       12 | b⁴   |
+  | b¹⁶  |        6 | b⁴   |
+  | b³²  |        3 | b⁴   |
+  | b⁶⁴  |        1 | b³⁶  |
+  | b¹²⁸ |        0 | b¹⁰⁰ |
+  
+  Basically, we *always* square $b$, and when the exponent is odd we multiply
+  the current value of $b$ with the current value of $a$. When exponent is 0 we
+  return $a$, or if we don't want to compute that last $b$ (which would make
+  sense to avoid overflow in some systems) we return $ab$ when the exponent
+  is 1. This last option is the one I implemented.
+
+  #+begin_src racket
+    (define (expt b n)
+      (define (square x) (* x x))
+      (define (halve x) (/ x 2))
+      (define (even? x) (= (remainder x 2) 0))
+
+      (define (expt-iter b n a)
+        (cond ((= n 0) a)
+              ((= n 1) (* a b))
+              ((even? n) (expt-iter (square b) (halve n) a))
+              (else (expt-iter (square b) (halve (- n 1)) (* a b)))))
+
+      (expt-iter b n 1))
+  #+end_src
+
+  Let us test a little:
+
+  #+begin_src racket
+    (check-equal? (expt 300 0) 1)
+    (check-equal? (expt 2 10) 1024)
+    (check-equal? (expt 10 10) 10000000000)
+  #+end_src
+  
+  The procedure is fast, I have tried to time it and the limit seems to be on
+  the i/o side (once numbers start to get large, it takes more time to print all
+  digits than the actual computation) and doesn't seem to be slower than
+  racket's built in ~(expt)~, at least informally.

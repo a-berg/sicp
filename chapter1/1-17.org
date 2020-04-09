@@ -1,0 +1,106 @@
+#+PROPERTY: header-args :tangle yes
+* Statement
+  
+* Solution
+  #+begin_src racket
+    (#lang sicp)
+    (#%require rackunit)
+  #+end_src
+  
+  Alright, since SICP is *not* my first programming book and I was lucky enough
+  to read the excellent /The Elements of Programming/ (Alexander Stepanov) and
+  delve a bit into abstract algebra after it, I can just jump ahead and go
+  directly to the conclusion of these exercises (1.16, 1.17, 1.18).
+
+  Basically the key concept here is the /monoid/, which is a pretty simple
+  algebraic structure composed of a set (in our case the positive integers,
+  $\mathbb{Z}_+$), an operation and an identity element. Since the set is the
+  same for all cases considered here, I will denote any monoid by the pair (op,
+  e). We have:
+
+  - $(\cdot, 1)$, a monoid with multiplication and one as the neutral element
+  (exercise 1.16).
+  - $(+, 0)$, a monoid with sum as operation and zero as the neutral element
+  (exercises 1.17 and 1.18).
+
+  The deeper implication here is that if an algorithm works for a given monoid,
+  then works for any monoid simply by switching the operation and the neutral
+  element. This is a powerful generalization mechanism from which I have
+  benefited a few times, and I am sure die hard Haskell programmers are pretty
+  used to it.
+  
+  Back to SICP, the exponentiation algorithm is perfectly valid to define
+  multiplication through summation provided we switch ~*~ by ~+~ and ~1~ by ~0~.
+  
+  Generalizing, we can pass an operation and an element to the algorithm and
+  make it valid for both multiplication, exponentiation, or any other "power
+  operation" over a monoid. One more modification is needed, though: I added a
+  condition for when $a=0$ and another one for when $a=1$. This is related to
+  the fact that $(\mathbb{Z}_+, +, \cdot, 1, 0)$ is a *ring*, but I will
+  remove it now to only make use of "monoidal" concepts.
+
+  #+begin_src racket
+    (define (power-op b n op e)
+      (define (square x) (op x x))
+      (define (halve x) (/ x 2))
+      (define (even? x) (= (remainder x 2) 0))
+
+      (define (power-iter b n a)
+        (if (= n 0)
+            a
+            (if (even? n)
+                (power-iter (square b) (halve n) a)
+                (power-iter (square b) (halve (- n 1)) (op a b)))))
+
+      (power-iter b n e))
+  #+end_src
+
+  This is still a bit bad in the sense that makes use of substraction and
+  division explicitly, but I think we can live with that.
+  
+  Lets test it:
+  #+begin_src racket
+    (check-equal? (power-op 3 2 + 0) 6) ;; 3*2 = 6
+    (check-equal? (power-op 3 2 * 1) 9) ;; 3^2 = 9
+  #+end_src
+  
+  Now for "style points":
+  #+begin_src racket
+    (define (expt b n) (power-op b n * 1))
+    (define (mult a b) (power-op a b + 0))
+  #+end_src
+
+  This concludes the exercises.
+  
+* Addendum
+  What happens when you change the "neutral element" in this
+  algorithm? One can do some quick tests:
+  
+  #+begin_src racket
+    (power-op 3 2 * 4) ;; 36 = 3^2*4
+    (power-op 3 2 + 4) ;; 10 = 3*2+4
+  #+end_src
+  
+  Ok thats kind of logic.
+
+  Now, one could ask: can we use this to create new operations, such as the ones
+  in exercises 1.10? Well, the answer is trickier. Exponentiation no longer
+  forms a monoid with positive integers and one, because its not commutative, so
+  we cannot expect the algorithm to behave well.
+  Still, we could try.
+  
+  #+begin_src racket
+    (define (↑↑ base exponent height) (power-op exponent height expt base))
+  #+end_src
+  
+  I hope the names are easy to understand. Let's start with the easiest one:
+  base is the number we are going to build the tower with. For example, with 2
+  we will have an exponentiation tower of 2^(2^(2^...)). The exponent is
+  the same as one would expect from normal exponentiation.
+  
+  The height is the tricky one: it defines how /high/ will the tower go. For
+  example, ~(tower 3 2 3) = (expt 3 (expt 2 3))~. You can imagine how fast this
+  can grow, for (tower 3 2 4) the number has 123 digits, and I am still not sure
+  this is real tower exponentiation, as the numbers seem a bit wacky. Will
+  further explore.
+  

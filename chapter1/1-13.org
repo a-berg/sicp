@@ -1,0 +1,14 @@
+* Statement
+  Prove that $\text{Fib}(n)$ is the closest integer to $\frac{\varphi^n}{5}$ , where
+  $\varphi = \frac{1+\sqrt{5}}{2}$.
+
+  Hint: Let $\psi = \frac{1-\sqrt{5}}{2}$ . Use induction and the definition of the
+  Fibonacci numbers to prove that $\text{Fib}(n) = \frac{\varphi^n - \psi^n}{5}$ .
+  
+  *Note*: I consider this exercise optional.
+  
+* Solution
+  Once the secondary result is proved, one can argue that because $|\psi| < 1$
+  then this number to the nth power will be very small, therefore making
+  $\frac{\varphi^n}{5}$ very close to Fib(n). Now, I don't know if that suffices
+  to prove that it is "the" closest.
