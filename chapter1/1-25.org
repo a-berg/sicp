@@ -1,0 +1,29 @@
+
+* Statement
+Alyssa P. Hacker complains that we went to a lot of extra work in writing
+expmod. After all, she says, since we already know how to compute exponentials,
+we could have simply written
+
+#+begin_src racket
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+#+end_src
+
+Is she correct? Would this procedure serve as well for our fast prime tester?
+Explain.
+
+* Solution
+
+The problem with this approach is that it computes the full exponential first.
+Given that fast exponentiation is usually used for really big bases/exponents
+(think of 64 or 128 bit cryptography), computing the exponential first would
+incur in some problems.
+
+I think that, first, in implementations without arbitrary-length integers it
+would overflow, which is a problem in itself. Secondly, those who have, would
+need to store extremely big numbers, which has both a computational cost
+(fourier transform to a suitable base to represent the number) and a hardware
+cost, with the possibility of running out of memory and spilling to disk (which
+is extremely slow).
+
+In order to avoid both problems, the fast expmod function is defined.
