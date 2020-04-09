@@ -76,11 +76,11 @@
 (check-equal? (count-calls 5) 18)
 #+end_src
 
-  The procedure is very simple. The variable ~c~ simply cummulatively sums ~b~.
-  The ~a~ and ~b~ variables update as defined.
+  The procedure is very simple. The variable ~c~ cummulatively sums ~b~. The ~a~
+  and ~b~ variables update as defined.
 
-  NOTE: There is a but somewhere. The value for 5 is OK, but it is wrong for
-  values of n from 1 to 4 (gives a value that is +1 the actual value). Also
-  fails for n=6...
+  # NOTE: There is a bug somewhere. The value for 5 is OK, but it is wrong for
+  # values of n from 1 to 4 (gives a value that is +1 the actual value). Also
+  # fails for n=6...
   
   
