@@ -1,0 +1,63 @@
+#+PROPERTY: header-args :tangle yes
+
+  #+begin_src racket
+    #lang sicp
+    (#%require rackunit)
+  #+end_src
+  
+* Statement
+  The sum procedure above generates a linear recursion. The procedure can be
+  rewritten so that the sum is performed iteratively. Show how to do this by
+  filling in the missing expressions in the following definition:
+  
+#+begin_src racket :tangle no
+  (define (sum term a next b)
+    (define (iter a result)
+      (if <??>
+          <??>
+          (iter <??> <??>)))
+    (iter <??> <??>))
+#+end_src
+
+* Solution
+  Lets remember (for my own sake) how the linear recursion sum was defined:
+
+#+begin_src racket :tangle no
+  (define (sum term a next b)
+    (if (> a b)
+        0
+        (+ (term a)
+           (sum term (next a) next b))))
+#+end_src
+
+  Because in an iterative procedure we need an accumulator, the implementation
+  is actually /simpler/! At each step of ~iter~, we just need to advance ~a~ and
+  then accumulate ~(term a)~ in the result. 
+  
+#+BEGIN_SRC racket
+    (define (sum term a next b) 
+      (define (iter a result)
+        (if (> a b)
+            0
+            (iter (next a) (+ result (term a)))))
+      (iter a 0))
+#+END_SRC
+
+  # Addendum
+  Because we are working with the sum, the neutral element for both naturals and
+  reals is zero; but this is easily generalizable to any algebra $(T, \circ, e)$ (I
+  decided to use a $T$ as in /type/, I don't wanna delve into the differences
+  between types and sets).
+
+ #+BEGIN_SRC racket :tangle no
+   (define (accum term a next b op neutral)
+     (define (iter a result)
+       (if (> a b)
+           neutral
+           (iter (next a) (op result (term a)))))
+     (iter a neutral))
+
+   (define (sum term a next b)
+     (accum term a next b + 0))
+#+END_SRC
+ 
