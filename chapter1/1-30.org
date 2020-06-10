@@ -38,7 +38,7 @@
     (define (sum term a next b) 
       (define (iter a result)
         (if (> a b)
-            0
+            result
             (iter (next a) (+ result (term a)))))
       (iter a 0))
 #+END_SRC
@@ -53,7 +53,7 @@
    (define (accum term a next b op neutral)
      (define (iter a result)
        (if (> a b)
-           neutral
+           result
            (iter (next a) (op result (term a)))))
      (iter a neutral))
 
