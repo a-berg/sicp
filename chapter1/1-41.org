@@ -1,0 +1,38 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+#lang sicp
+(#%require rackunit)
+(#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+
+  Define a procedure ~double~ that takes a procedure of one argument as argument
+  and returns a procedure that applies the original procedure twice. For
+  example, if ~inc~ is a procedure that adds 1 to its argument, then (double ~inc~)
+  should be a procedure that adds 2.
+
+#+begin_src racket :tangle no
+  (define (double f)
+    'your-answer-here)
+#+end_src
+
+  What value is returned by the following? (Please do not use the interpreter for this.)
+
+#+begin_src racket :tangle no
+  (((double (double double)) inc) 5)
+#+end_src
+
+* Solution
+  
+  This function trivially works:
+
+#+begin_src racket
+  (define (double f)
+    (lambda (x) (f (f x))))
+#+end_src
+
+  For the second part, because "double" acts as a composition of a function of
+  itself, I think we are esentially composing 2³ i.e. 8 times the function ~inc~
+  and therefore the result should be 16+5=21.

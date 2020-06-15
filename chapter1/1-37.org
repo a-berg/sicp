@@ -1,0 +1,91 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+
+An infinite continued fraction is an expression of the form
+
+As an example, one can show that the infinite continued fraction expansion with
+the Ni and the Di all equal to 1 produces 1ϕ, where ϕ is the golden ratio
+(described in section 1.2.2). One way to approximate an infinite continued
+fraction is to truncate the expansion after a given number of terms. Such a
+truncation — a so-called k-term finite continued fraction — has the form
+
+Suppose that n and d are procedures of one argument (the term index i that
+return the Ni and Di of the terms of the continued fraction). Define a procedure
+cont-frac such that evaluating (cont-frac n d k) computes the value of the k
+-term finite continued fraction.
+
+Check your procedure by approximating 1/ϕ using
+
+#+begin_src racket :tangle no
+(define k 10)
+
+(cont-frac (lambda (i) 1.0)
+           (lambda (i) 1.0)
+           k)
+#+end_src
+
+for successive values of k. How large must you make k in order to get an
+approximation that is accurate to 4 decimal places?
+
+Try to write both an iterative and a recursive version of cont-frac.
+
+* Solution
+  
+  While this problem bears resemblance to both the ~accumulate~ and
+  ~fixed-point~ procedures, it is distinct in two key points that, I think,
+  warrant a new implementation. First is the fact that it's necessary to iterate
+  backwards (something accumulate isn't suited to do, at least easily), and
+  secondly the fact that ~fixed-point~ isn't able to deal with series (like ~n~
+  and ~d~).
+
+  My solution is more akin to ~accumulate~ than to ~fixed-point~. In
+  anticipation to what I believe is going to appear soon, the "~for~"
+  higher-order procedure, I have coded it in a way that kinda resembles a for
+  loop. Here the "body" of the loop would be the procedure:
+  
+  #+begin_src racket
+  (define (f i result)
+    (/ (n i) (+ result (d i))))
+  #+end_src
+  
+  And also:
+  
+  #+begin_src racket
+  (define (-- i) (- i 1))
+  #+end_src
+  
+  With this, the iterative procedure is pretty close to a C-style for loop, I think:
+  
+#+begin_src racket
+  (define (cont-frac n d k)
+    (define (iter i result)
+      (if (> 0 i)
+          result
+          (iter (-- i) (f i result))))
+    (iter k (/ (n k) (d k))))
+#+end_src
+
+  The results are pretty good for 100 iterations:
+
+#+begin_src racket
+  (define k 100)
+
+  (define phi-exact (halve (+ 1 (sqrt 5))))
+  (define phi (+ 1 (cont-frac (lambda (i) 1.0) (lambda (i) 1.0) k)))
+
+  (check-= phi-exact phi 1e-50)
+#+end_src
+
+  As for the recursive procedure:
+  
+#+begin_src racket 
+  (define (cont-frac n d k)
+    ;;to-do)
+#+end_src

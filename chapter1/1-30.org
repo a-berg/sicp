@@ -43,7 +43,8 @@
       (iter a 0))
 #+END_SRC
 
-  # Addendum
+* Addendum
+  
   Because we are working with the sum, the neutral element for both naturals and
   reals is zero; but this is easily generalizable to any algebra $(T, \circ, e)$ (I
   decided to use a $T$ as in /type/, I don't wanna delve into the differences

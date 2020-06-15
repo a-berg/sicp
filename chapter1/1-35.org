@@ -1,0 +1,46 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+
+Show that the golden ratio (section 1.2.2) is a fixed point of the
+transformation x↦1+1/x, and use this fact to compute ϕ by means of the
+fixed-point procedure.
+
+* Solution
+
+  Its a simple question.
+  
+#+BEGIN_SRC racket
+  (define phi
+    (fixed-point (lambda (x) (+ 1 (/ 1 x))) 1.5))
+#+END_SRC
+ 
+  I defined the tolerance as $10^{-10}$ instead of $10^{-5}$.
+
+#+begin_src racket
+  (check-= (halve (+ 1 (sqrt 5))) phi 1e-10)
+#+end_src
+
+* Addendum
+
+  Mathematically, proving it has no merit as it's practically implicit from the
+  definition of φ. For example, we could use this argument:
+  
+  #+begin_quote
+  φ is the root of the polynomial x^2 - x - 1, so φ^2 - φ - 1 = 0. This is
+  equivalent to φ(φ - 1) = 1, or φ = 1 + 1/φ. Therefore, φ is the fixed point of
+  the function f(x) = 1 + 1/x.
+  #+end_quote
+  
+  Or this other (directly from the definition of the golden ratio):
+
+  #+begin_quote
+  For any pair of numbers a and b, it is said they are in /golden ratio/ if (a +
+  b) / a = a/b = φ. Hence b/a = 1/φ and we have: 1+1/φ = φ.
+  #+end_quote

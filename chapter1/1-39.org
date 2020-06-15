@@ -1,0 +1,60 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+
+  A continued fraction representation of the tangent function was published in
+  1770 by the German mathematician J.H. Lambert:
+  
+  tanx=x1−x23−x25−⋱
+
+  where x is in radians. Define a procedure (tan-cf x k) that computes an
+  approximation to the tangent function based on Lambert's formula. k specifies
+  the number of terms to compute, as in Exercise 1-37
+
+* Solution 
+
+  Again, define ~cont-frac~ (seriously, I need to start importing from pervious
+  exercises)
+  
+#+begin_src racket
+(define (cont-frac n d k)
+  (define (f i result)
+    (/ (n i) (+ result (d i))))
+  (define (iter i result)
+    (if (> 0 i)
+        result
+        (iter (-- i) (f i result))))
+  (iter k (/ (n k) (d k))))
+#+end_src
+
+  We could define the series as:
+
+  #+begin_src 
+  N_i x -x² -x² -x² ... -> x if i = 0,  -x² otherwise
+  D_i 1  3   5   7  ... -> 2i + 1
+  #+end_src
+
+  So the continued fraction version of tangent is simply:
+
+#+begin_src racket
+  (define (tan-cf x k)
+    (define (d i) (+ 1 (* 2 i)))
+    (define (n i)
+      (if (= i 0)
+          x
+          (- 0 (square x))) )
+    (cont-frac n d k)
+#+end_src
+
+  Again, we can see this gives a pretty good estimation with just a few
+  iterations (for example, with k=10 there are 15 correct digits for tan(1)),
+  although I have observed that for arguments of /x/ that are semi-large
+  (/x=100/) the convergence takes much higher values of k (perhaps this
+  continued fraciton comes from an expansion at x=0?)
+  

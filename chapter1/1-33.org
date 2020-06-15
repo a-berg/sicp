@@ -1,0 +1,64 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+  
+You can obtain an even more general version of accumulate (exercise 1.32) by
+introducing the notion of a filter on the terms to be combined. That is, combine
+only those terms derived from values in the range that satisfy a specified
+condition. The resulting filtered-accumulate abstraction takes the same
+arguments as accumulate, together with an additional predicate of one argument
+that specifies the filter. Write filtered-accumulate as a procedure.
+
++ the sum of the squares of the prime numbers in the interval a to b (assuming
+  that you have a prime? predicate already written)
++ the product of all the positive integers less than n that are relatively prime
+  to n (i.e., all positive integers i<n such that GCD(i,n)=1).
+
+* Solution
+  
+  Despite this being an extension to exercise 1-32, which I solved in the
+  addendum of 1-30, I will implement the ~accumulate~ procedure here and extend
+  it to ~filtered-accumulate~.
+  
+  Basically, I perform a check on the value. If true, do the accumulation with
+  ~(term a)~, else do it with the null-value.
+
+ #+BEGIN_SRC racket
+   (define (filtered-accumulate combiner null-value term a next b filter?)
+     (define (iter a result)
+       (if (> a b)
+           result
+           (iter (next a) (if (filter? a)
+                              (combiner result (term a))
+                              (combiner result null-value)))))
+     (iter a null-value))
+#+END_SRC
+
+  Now, for the testing. I haven't implemented the ~prime?~ filter at the time of
+  solving this[fn:1], so I will be testing on a simple odd-numbers sumation and
+  then do the GCD thing.
+  
+#+BEGIN_SRC racket
+  (filtered-accumulate + 0 identity 0 ++ 10 odd?)
+#+END_SRC
+
+  Now, sum all positive integers such that GCD(i,n)=1
+
+#+BEGIN_SRC racket
+  (define (relative-prime? i n)
+    (= (gcd i n) 1))
+
+  (define k 10)
+  (filtered-accumulate + 0 identity 0 ++ k (lambda (i) (relative-prime? i k)))
+#+END_SRC
+
+* Footnotes
+
+[fn:1] What with I have already implemented a Miller-Rabin primality
+  test in C++ and didn't want to do it in Scheme too. Altough I should...
