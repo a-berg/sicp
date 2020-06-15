@@ -1,0 +1,37 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+
+  Let f and g be two one-argument functions. The composition f after g is
+  defined to be the function x f(g(x)). Define a procedure compose that
+  implements composition.
+
+#+begin_src racket :tangle no
+  (define (compose f g)
+    'your-answer-here)
+#+end_src
+
+  For example, if inc is a procedure that adds 1 to its argument,
+
+#+begin_src racket :tangle no
+  ((compose square inc) 6)
+#+end_src
+
+* Solution
+
+  Is anyone surprised by this exercise, given the previous one? Anyways,
+  composing is trivial.
+
+#+begin_src racket
+  (define (compose f g)
+    (lambda (x) (f (g x))))
+#+end_src
+
+  By the way, it seems like Scheme (or Racket) have the procedure ~compose~
+  built-in.

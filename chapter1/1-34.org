@@ -1,0 +1,44 @@
+#+PROPERTY: header-args :tangle no
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require common_sicp_funcs)
+#+end_src
+
+* Statement
+
+ Suppose we define the procedure
+ 
+#+BEGIN_SRC racket :tangle no
+  (define (f g)
+    (g 2))
+#+END_SRC
+
+Then we have
+
+#+BEGIN_SRC racket :tangle no
+  (f square)
+  ;; 4
+#+END_SRC
+
+#+BEGIN_SRC racket :tangle no
+  (f (lambda (z) (* z (+ z 1))))
+  ;; 6
+#+END_SRC
+
+What happens if we (perversely) ask the interpreter to evaluate the combination
+~(f f)~? Explain.
+
+* Solution
+
+  If you do that, the interpreter would expand thus:
+
+#+BEGIN_SRC racket 
+  (f f)
+  (f 2)
+  (2 2)
+#+END_SRC
+
+Which is an invalid expression.
+

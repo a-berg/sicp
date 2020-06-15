@@ -1,0 +1,44 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+#+end_src
+
+* Statement
+
+Define a procedure ~cubic~ that can be used together with the ~newtons-method~
+procedure in expressions of the form
+
+#+begin_src racket :tangle no
+(define (cubic a b c)
+  'your-answer-here)
+
+(newtons-method (cubic a b c) 1)
+#+end_src
+
+to approximate zeros of the cubic x³+ax²+bx+c. 
+
+* Solution
+  
+  The cubic polynomial procedure is easy to implement as a procedure that
+  returns a procedure:
+
+#+begin_src racket
+  (define (cubic a b c) ;; Takes 3 numbers, returns a function that computes the
+                        ;; 3rd grade polynomial defined as x³+ax²+bx+c.
+    (lambda (x) (+ (expt x 3) (* a (square x)) (* b x) c)))
+#+end_src
+
+  Now, if I understood correctly, I just have to do:
+
+#+begin_src racket
+  (newtons-method (cubic 1 2 -3) 1) ;; 0.843734277898069
+#+end_src
+
+  To get the zeros of said polynomial. The solution appears to be correct
+  according to Wolfram Alpha.
+  
+  Note that in this case said polynomial has only 1 real-valued solution, and
+  the solution this procedure returns depends on the starting guess.
