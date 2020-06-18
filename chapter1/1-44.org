@@ -1,0 +1,47 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "common_sicp_funcs.rkt")
+  #+end_src
+
+* Statement
+
+  The idea of smoothing a function is an important concept in signal processing.
+  If ƒ is a function and dx is some small number, then the smoothed version of ƒ
+  is the function whose value at a point x is the average of ƒ(x−dx), ƒ(x), and
+  ƒ(x+dx). Write a procedure smooth that takes as input a procedure that
+  computes ƒ and returns a procedure that computes the smoothed ƒ. It is
+  sometimes valuable to repeatedly smooth a function (that is, smooth the
+  smoothed function, and so on) to obtained the n-fold smoothed function. Show
+  how to generate the n-fold smoothed function of any given function using
+  smooth and repeated from exercise 1.43.
+  
+#+begin_src racket
+  (define dx 0.1)
+#+end_src
+
+* Solution
+  
+  The smoothing function is easy enough:
+  
+#+begin_src racket
+  (define (smooth f)
+    (lambda (x) (average (f (+ x dx))
+                         (f x)
+                         (f (- x dx)))))
+#+end_src
+
+  Please note that I have defined =average= as a variadic function in [[file:common_sicp_funcs.rkt][the common
+  functions file]], which lets me use any number of arguments (instead of just 2
+  as it was until now).
+
+  Now, for ~repeated-smooth~, I only need to use ~repeated~ over ~smooth~, then
+  apply that to ƒ, then wrap it all in a lambda. Apart from that "inception"
+  level of nesting, this exercise is a piece 'o cake.
+
+#+begin_src racket
+  (define (repeated-smooth f n)
+    (lambda (x) (((repeated smooth n) f) x)))
+#+end_src

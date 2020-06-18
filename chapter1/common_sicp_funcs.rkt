@@ -10,7 +10,8 @@
    fixed-point
    average-damp
    newtons-method
-   fixed-point-of-transform)
+   fixed-point-of-transform
+   repeated)
 
 ;;; ???
 (define (square x) (* x x))
@@ -19,7 +20,7 @@
 (define (-- n) (- n 1))
 (define (fl-eq? x y eps)
   (< (abs (- x y)) eps))
-(define (average x y) (/ (+ x y) 2))
+(define (average . args) (/ (apply + args) (length args)))
 
 ;;; 1.3.3 Procedures as general Methods
 ;;;; Search / half interval method
@@ -79,12 +80,23 @@
 (define (fixed-point-of-transform g transform guess)
   (fixed-point (transform g) guess))
 
-;;; Exercise 1.37
-;; (define (cont-frac n d k)
-;;   (define (f i result)
-;;     (/ (n i) (+ result (d i))))
-;;   (define (iter i result)
-;;     (if (> 0 i)
-;;         result
-;;         (iter (-- i) (f i result))))
-;;   (iter k (/ (n k) (d k))))
+;; This be useful on exercises 44-46 so am pasting it there yo.
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(define (power-op b n op e)
+  (define (square x) (op x x))
+  (define (halve x) (/ x 2))
+  (define (even? x) (= (remainder x 2) 0))
+
+  (define (power-iter b n result)
+    (if (= n 0)
+        result
+        (if (even? n)
+            (power-iter (square b) (halve n) result)
+            (power-iter (square b) (halve (- n 1)) (op result b)))))
+
+  (power-iter b n e))
+
+(define (repeated f n)
+  (power-op f n compose identity))
