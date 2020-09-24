@@ -1,0 +1,72 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require rackunit)
+  (#%require "chapter2_functions.rkt")
+  (#%require "2-2.rkt")
+#+end_src
+
+* Statement
+
+  Implement a representation for rectangles in a plane. (Hint: You may want to
+  make use of Exercise 2-2.) In terms of your constructors and selectors, create
+  procedures that compute the perimeter and the area of a given rectangle. Now
+  implement a different representation for rectangles. Can you design your
+  system with suitable abstraction barriers, so that the same perimeter and area
+  procedures will work using either representation?
+
+* Solution
+  
+  So, importing functions from previous exercises is much easier than I thought.
+  I just need to ~#%provide~ the functions I want to make public at the end of the
+  exercise and then ~#%require~ (the ~#%~ is key here as it lets me use Racket
+  functions without leaving SICP language).
+  
+  Constructor:
+  
+#+begin_src racket
+  (define (make-rectangle top-left bottom-right)
+    (cons top-left bottom-right))
+#+end_src
+
+  Accesors:
+
+#+begin_src racket
+  (define (top-left rectangle)
+    (car rectangle))
+
+  (define (top-right rectangle)
+    (make-point (x-point bottom-right) (y-point top-left)))
+
+  (define (bottom-right rectangle)
+    (cdr rectangle))
+
+  (define (bottom-left rectangle)
+    (make-point (x-point top-left) (y-point bottom-right)))
+#+end_src
+
+  Perimeter:
+
+#+begin_src racket
+  (define (rectangle-width rectangle)
+    (abs (- (x-point (top-left rectangle))
+            (x-point (bottom-right rectangle)))))
+
+  (define (rectangle-height rectangle)
+    (abs (- (y-point (top-left rectangle))
+            (y-point (bottom-right rectangle)))))
+
+  (define (rectangle-perimeter rectangle)
+    (* 2 (+ (rectangle-width rectangle) (rectangle-height rectangle))))
+#+end_src
+
+  Test:
+  
+#+begin_src racket
+  (define a (make-point 0.0 1.0))
+  (define b (make-point 1.0 0.0))
+  (define R (make-rectangle a b))
+
+  (rectangle-perimeter R) ;; 4 as expected
+#+end_src

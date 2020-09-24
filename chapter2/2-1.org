@@ -1,0 +1,34 @@
+#+PROPERTY: header-args :tangle yes
+
+#+begin_src racket
+  #lang sicp
+  (#%require "chapter2_functions.rkt")
+#+end_src
+
+* Statement
+
+  Define a better version of ~make-rat~ that handles both positive and negative
+  arguments. ~Make-rat~ should normalize the sign so that if the rational number
+  is positive, both the numerator and denominator are positive, and if the
+  rational number is negative, only the numerator is negative.
+
+* Solution
+
+  Easy enough:
+
+#+begin_src racket
+  (define (make-rat n d)
+    (define (guard n) (max 1 n)) ;; Prevent division by zero!
+    (let ((g (guard (gcd n d)))
+          (sign (/ (* n d) (guard (abs (* n d))))))
+      (cons (* sign (abs (/ n g) )) (abs (/ d g)))))
+#+end_src
+
+  Test it a little:
+
+#+begin_src racket
+  (print-rat (make-rat -5 -10))
+  (print-rat (make-rat -5 10))
+  (print-rat (make-rat 5 -10))
+  (print-rat (make-rat 5 10))
+#+end_src
